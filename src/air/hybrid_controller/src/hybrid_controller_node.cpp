@@ -1,26 +1,65 @@
 #include "rclcpp/rclcpp.hpp"
 #include "hybrid_msgs/msg/vehicle_state.hpp"
+#include "hybrid_msgs/srv/set_control_mode.hpp"
 
 class HybridController : public rclcpp::Node
 {
 public:
   HybridController()
-  : Node("hybrid_controller")
+  : Node("hybrid_controller"),
+    control_mode_("px4")
   {
-    publisher_ = this->create_publisher<hybrid_msgs::msg::VehicleState>("vehicle_state_out", 10);
-    subscription_ = this->create_subscription<hybrid_msgs::msg::VehicleState>(
-      "vehicle_state_in", 10, std::bind(&HybridController::topic_callback, this, std::placeholders::_1));
+    px4_publisher_ = this->create_publisher<hybrid_msgs::msg::VehicleState>("px4/vehicle_state_in", 10);
+    ardupilot_publisher_ = this->create_publisher<hybrid_msgs::msg::VehicleState>("ardupilot/vehicle_state_in", 10);
+
+    px4_subscription_ = this->create_subscription<hybrid_msgs::msg::VehicleState>(
+      "px4/vehicle_state_out", 10, std::bind(&HybridController::px4_topic_callback, this, std::placeholders::_1));
+    ardupilot_subscription_ = this->create_subscription<hybrid_msgs::msg::VehicleState>(
+      "ardupilot/vehicle_state_out", 10, std::bind(&HybridController::ardupilot_topic_callback, this, std::placeholders::_1));
+
+    control_mode_service_ = this->create_service<hybrid_msgs::srv::SetControlMode>(
+      "set_control_mode", std::bind(&HybridController::set_control_mode, this, std::placeholders::_1, std::placeholders::_2));
   }
 
 private:
-  void topic_callback(const hybrid_msgs::msg::VehicleState::SharedPtr msg) const
+  void px4_topic_callback(const hybrid_msgs::msg::VehicleState::SharedPtr msg) const
   {
-    RCLCPP_INFO(this->get_logger(), "I heard a message");
-    // TODO: Process the message and publish a new one
-    publisher_->publish(*msg);
+    if (control_mode_ == "px4") {
+      RCLCPP_INFO(this->get_logger(), "Received message from PX4");
+      // Forward the message to ArduPilot
+      ardupilot_publisher_->publish(*msg);
+    }
   }
-  rclcpp::Subscription<hybrid_msgs::msg::VehicleState>::SharedPtr subscription_;
-  rclcpp::Publisher<hybrid_msgs::msg::VehicleState>::SharedPtr publisher_;
+
+  void ardupilot_topic_callback(const hybrid_msgs::msg::VehicleState::SharedPtr msg) const
+  {
+    if (control_mode_ == "ardupilot") {
+      RCLCPP_INFO(this->get_logger(), "Received message from ArduPilot");
+      // Forward the message to PX4
+      px4_publisher_->publish(*msg);
+    }
+  }
+
+  void set_control_mode(
+    const std::shared_ptr<hybrid_msgs::srv::SetControlMode::Request> request,
+    std::shared_ptr<hybrid_msgs::srv::SetControlMode::Response>      response)
+  {
+    if (request->mode == "px4" || request->mode == "ardupilot") {
+      control_mode_ = request->mode;
+      response->success = true;
+      RCLCPP_INFO(this->get_logger(), "Control mode set to %s", control_mode_.c_str());
+    } else {
+      response->success = false;
+      RCLCPP_ERROR(this->get_logger(), "Invalid control mode: %s", request->mode.c_str());
+    }
+  }
+
+  std::string control_mode_;
+  rclcpp::Publisher<hybrid_msgs::msg::VehicleState>::SharedPtr px4_publisher_;
+  rclcpp::Publisher<hybrid_msgs::msg::VehicleState>::SharedPtr ardupilot_publisher_;
+  rclcpp::Subscription<hybrid_msgs::msg::VehicleState>::SharedPtr px4_subscription_;
+  rclcpp::Subscription<hybrid_msgs::msg::VehicleState>::SharedPtr ardupilot_subscription_;
+  rclcpp::Service<hybrid_msgs::srv::SetControlMode>::SharedPtr control_mode_service_;
 };
 
 int main(int argc, char * argv[])

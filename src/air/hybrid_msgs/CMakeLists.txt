@@ -15,6 +15,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/VehicleState.msg"
+  "srv/SetControlMode.srv"
   DEPENDENCIES geometry_msgs std_msgs
 )
 
