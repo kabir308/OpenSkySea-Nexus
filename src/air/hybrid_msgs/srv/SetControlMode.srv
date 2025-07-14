@@ -1,0 +1,4 @@
+# Set Control Mode Service
+string mode # "px4" or "ardupilot"
+---
+bool success
