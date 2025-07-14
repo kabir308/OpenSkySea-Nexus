@@ -1,0 +1,18 @@
+<library path="lib/libmavros_translator.so">
+  <class name="nexus_communication_protocol/MavrosTranslator"
+         type="nexus_communication_protocol::MavrosTranslator"
+         base_class_type="nexus_communication_protocol::TranslatorPlugin">
+    <description>
+      Translator for MAVROS.
+    </description>
+  </class>
+</library>
+<library path="lib/libpypilot_translator.so">
+  <class name="nexus_communication_protocol/PyPilotTranslator"
+         type="nexus_communication_protocol::PyPilotTranslator"
+         base_class_type="nexus_communication_protocol::TranslatorPlugin">
+    <description>
+      Translator for PyPilot.
+    </description>
+  </class>
+</library>

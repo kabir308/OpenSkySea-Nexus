@@ -13,6 +13,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(pluginlib REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GoToWaypoint.msg"
@@ -20,12 +21,28 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES geometry_msgs std_msgs
 )
 
+add_library(mavros_translator src/mavros_translator.cpp)
+target_link_libraries(mavros_translator pluginlib)
+
+add_library(pypilot_translator src/pypilot_translator.cpp)
+target_link_libraries(pypilot_translator pluginlib)
+
+pluginlib_export_plugin_description_file(nexus_communication_protocol translator_plugins.xml)
+
 add_executable(ncp_translator_node src/ncp_translator_node.cpp)
 ament_target_dependencies(ncp_translator_node rclcpp mavros_msgs)
 
 install(TARGETS
   ncp_translator_node
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS
+  mavros_translator
+  pypilot_translator
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ament_package()

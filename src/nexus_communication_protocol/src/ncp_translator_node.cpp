@@ -1,6 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
-#include "nexus_communication_protocol/msg/go_to_waypoint.hpp"
-#include "mavros_msgs/msg/position_target.hpp"
+#include "pluginlib/class_loader.hpp"
+#include "nexus_communication_protocol/translator_plugin.hpp"
 
 class NcpTranslator : public rclcpp::Node
 {
@@ -8,30 +8,31 @@ public:
   NcpTranslator()
   : Node("ncp_translator")
   {
-    publisher_ = this->create_publisher<mavros_msgs::msg::PositionTarget>("mavros/setpoint_raw/local", 10);
+    loader_ = std::make_shared<pluginlib::ClassLoader<nexus_communication_protocol::TranslatorPlugin>>(
+      "nexus_communication_protocol", "nexus_communication_protocol::TranslatorPlugin");
+
+    try {
+      translator_ = loader_->createSharedInstance("nexus_communication_protocol/MavrosTranslator");
+      translator_->initialize(this->get_node_base_interface());
+    } catch (pluginlib::PluginlibException & ex) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to load translator plugin: %s", ex.what());
+    }
+
     subscription_ = this->create_subscription<nexus_communication_protocol::msg::GoToWaypoint>(
       "ncp/go_to_waypoint", 10, std::bind(&NcpTranslator::topic_callback, this, std::placeholders::_1));
   }
 
 private:
-  void topic_callback(const nexus_communication_protocol::msg::GoToWaypoint::SharedPtr msg) const
+  void topic_callback(const nexus_communication_protocol::msg::GoToWaypoint::SharedPtr msg)
   {
-    RCLCPP_INFO(this->get_logger(), "Received GoToWaypoint message");
-    auto position_target = mavros_msgs::msg::PositionTarget();
-    position_target.header.stamp = this->now();
-    position_target.coordinate_frame = mavros_msgs::msg::PositionTarget::FRAME_LOCAL_NED;
-    position_target.type_mask = mavros_msgs::msg::PositionTarget::IGNORE_VX |
-                                mavros_msgs::msg::PositionTarget::IGNORE_VY |
-                                mavros_msgs::msg::PositionTarget::IGNORE_VZ |
-                                mavros_msgs::msg::PositionTarget::IGNORE_AFX |
-                                mavros_msgs::msg::PositionTarget::IGNORE_AFY |
-                                mavros_msgs::msg::PositionTarget::IGNORE_AFZ |
-                                mavros_msgs::msg::PositionTarget::IGNORE_YAW_RATE;
-    position_target.position = msg->position;
-    publisher_->publish(position_target);
+    if (translator_) {
+      translator_->translate(msg);
+    }
   }
+
+  std::shared_ptr<pluginlib::ClassLoader<nexus_communication_protocol::TranslatorPlugin>> loader_;
+  std::shared_ptr<nexus_communication_protocol::TranslatorPlugin> translator_;
   rclcpp::Subscription<nexus_communication_protocol::msg::GoToWaypoint>::SharedPtr subscription_;
-  rclcpp::Publisher<mavros_msgs::msg::PositionTarget>::SharedPtr publisher_;
 };
 
 int main(int argc, char * argv[])
