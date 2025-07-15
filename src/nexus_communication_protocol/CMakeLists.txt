@@ -18,6 +18,8 @@ find_package(pluginlib REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/GoToWaypoint.msg"
   "msg/SetVelocity.msg"
+  "msg/FollowTrajectory.msg"
+  "msg/InspectZone.msg"
   DEPENDENCIES geometry_msgs std_msgs
 )
 
@@ -26,6 +28,9 @@ target_link_libraries(mavros_translator pluginlib)
 
 add_library(pypilot_translator src/pypilot_translator.cpp)
 target_link_libraries(pypilot_translator pluginlib)
+
+add_library(custom_translator src/custom_translator.cpp)
+target_link_libraries(custom_translator pluginlib)
 
 pluginlib_export_plugin_description_file(nexus_communication_protocol translator_plugins.xml)
 
@@ -40,6 +45,7 @@ install(TARGETS
 install(TARGETS
   mavros_translator
   pypilot_translator
+  custom_translator
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
