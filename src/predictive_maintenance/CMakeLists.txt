@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(environment_modeler)
+project(predictive_maintenance)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -15,17 +15,14 @@ find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/OceanCurrent.msg"
-  "msg/Weather.msg"
-  "msg/MarineLife.msg"
-  DEPENDENCIES geometry_msgs std_msgs
+  "msg/ComponentState.msg"
 )
 
-add_executable(environment_modeler_node src/environment_modeler_node.cpp)
-ament_target_dependencies(environment_modeler_node rclcpp std_srvs)
+add_executable(predictive_maintenance_node src/predictive_maintenance_node.cpp)
+ament_target_dependencies(predictive_maintenance_node rclcpp)
 
 install(TARGETS
-  environment_modeler_node
+  predictive_maintenance_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
