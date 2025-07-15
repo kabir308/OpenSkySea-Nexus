@@ -7,6 +7,15 @@
     </description>
   </class>
 </library>
+<library path="lib/libcustom_translator.so">
+  <class name="nexus_communication_protocol/CustomTranslator"
+         type="nexus_communication_protocol::CustomTranslator"
+         base_class_type="nexus_communication_protocol::TranslatorPlugin">
+    <description>
+      Translator for custom autopilot.
+    </description>
+  </class>
+</library>
 <library path="lib/libpypilot_translator.so">
   <class name="nexus_communication_protocol/PyPilotTranslator"
          type="nexus_communication_protocol::PyPilotTranslator"
