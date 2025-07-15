@@ -15,11 +15,16 @@ find_package(rclcpp REQUIRED)
 find_package(energy_prediction_msgs REQUIRED)
 
 add_executable(predictive_energy_manager_node src/predictive_energy_manager_node.cpp)
-ament_target_dependencies(predictive_energy_manager_node rclcpp energy_prediction_msgs)
+ament_target_dependencies(predictive_energy_manager_node rclcpp energy_prediction_msgs energy_msgs)
 
 install(TARGETS
   predictive_energy_manager_node
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 ament_package()

@@ -15,7 +15,7 @@ find_package(rclcpp REQUIRED)
 find_package(hybrid_msgs REQUIRED)
 
 add_executable(sea_simulator_node src/sea_simulator_node.cpp)
-ament_target_dependencies(sea_simulator_node rclcpp hybrid_msgs)
+ament_target_dependencies(sea_simulator_node rclcpp hybrid_msgs energy_msgs)
 
 install(TARGETS
   sea_simulator_node
