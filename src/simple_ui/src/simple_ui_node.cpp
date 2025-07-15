@@ -1,6 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "nexus_communication_protocol/msg/go_to_waypoint.hpp"
 #include <iostream>
+#include <string>
 
 class SimpleUI : public rclcpp::Node
 {
@@ -16,6 +17,15 @@ public:
 private:
   void prompt_user()
   {
+    std::string password;
+    std::cout << "Enter password: ";
+    std::cin >> password;
+
+    if (password != "password") {
+      std::cout << "Invalid password" << std::endl;
+      return;
+    }
+
     std::cout << "Enter waypoint (x y): ";
     double x, y;
     std::cin >> x >> y;
