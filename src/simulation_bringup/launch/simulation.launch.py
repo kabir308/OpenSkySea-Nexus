@@ -30,4 +30,9 @@ def generate_launch_description():
                 os.path.join(get_package_share_directory('hybrid_controller'), 'launch', 'hybrid_controller.launch.py')
             ),
         ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory('sea_simulator'), 'launch', 'sea_simulator.launch.py')
+            ),
+        ),
     ])
