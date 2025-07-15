@@ -35,4 +35,14 @@ def generate_launch_description():
                 os.path.join(get_package_share_directory('sea_simulator'), 'launch', 'sea_simulator.launch.py')
             ),
         ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory('predictive_energy_manager'), 'launch', 'predictive_energy_manager.launch.py')
+            ),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory('multi_channel_stack'), 'launch', 'multi_channel_stack.launch.py')
+            ),
+        ),
     ])

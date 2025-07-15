@@ -1,5 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "energy_prediction_msgs/msg/power_prediction.hpp"
+#include "energy_msgs/msg/power_state.hpp"
 
 class PredictiveEnergyManager : public rclcpp::Node
 {
@@ -8,20 +9,22 @@ public:
   : Node("predictive_energy_manager")
   {
     publisher_ = this->create_publisher<energy_prediction_msgs::msg::PowerPrediction>("power_prediction", 10);
-    timer_ = this->create_wall_timer(
-      std::chrono::seconds(1), std::bind(&PredictiveEnergyManager::timer_callback, this));
+    subscription_ = this->create_subscription<energy_msgs::msg::PowerState>(
+      "sea/power_state_out", 10, std::bind(&PredictiveEnergyManager::power_state_callback, this, std::placeholders::_1));
   }
 
 private:
-  void timer_callback()
+  void power_state_callback(const energy_msgs::msg::PowerState::SharedPtr msg)
   {
+    RCLCPP_INFO(this->get_logger(), "Received power state");
+    // TODO: Implement actual prediction logic based on power state
     auto message = energy_prediction_msgs::msg::PowerPrediction();
-    // TODO: Implement actual prediction logic
-    message.power_consumption = 100.0;
-    message.power_generation = 50.0;
+    message.power_consumption = -msg->battery_current * msg->battery_voltage;
+    message.power_generation = 0.0; // TODO: Predict generation
     publisher_->publish(message);
   }
-  rclcpp::TimerBase::SharedPtr timer_;
+
+  rclcpp::Subscription<energy_msgs::msg::PowerState>::SharedPtr subscription_;
   rclcpp::Publisher<energy_prediction_msgs::msg::PowerPrediction>::SharedPtr publisher_;
 };
 
