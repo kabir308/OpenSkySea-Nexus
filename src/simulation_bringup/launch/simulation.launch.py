@@ -27,7 +27,12 @@ def generate_launch_description():
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                os.path.join(get_package_share_directory('hybrid_controller'), 'launch', 'hybrid_controller.launch.py')
+                os.path.join(get_package_share_directory('hybrid_controller'), 'launch', 'quadcopter_simulation.launch.py')
+            ),
+        ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory('rover_controller'), 'launch', 'rover_simulation.launch.py')
             ),
         ),
         IncludeLaunchDescription(
