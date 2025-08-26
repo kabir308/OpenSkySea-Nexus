@@ -8,14 +8,19 @@ public:
   NcpTranslator()
   : Node("ncp_translator")
   {
+    this->declare_parameter<std::string>("translator_plugin", "nexus_communication_protocol/MavrosTranslator");
+    std::string translator_plugin_name;
+    this->get_parameter("translator_plugin", translator_plugin_name);
+
     loader_ = std::make_shared<pluginlib::ClassLoader<nexus_communication_protocol::TranslatorPlugin>>(
       "nexus_communication_protocol", "nexus_communication_protocol::TranslatorPlugin");
 
     try {
-      translator_ = loader_->createSharedInstance("nexus_communication_protocol/MavrosTranslator");
+      translator_ = loader_->createSharedInstance(translator_plugin_name);
       translator_->initialize(this->get_node_base_interface());
+      RCLCPP_INFO(this->get_logger(), "Loaded translator plugin: %s", translator_plugin_name.c_str());
     } catch (pluginlib::PluginlibException & ex) {
-      RCLCPP_ERROR(this->get_logger(), "Failed to load translator plugin: %s", ex.what());
+      RCLCPP_ERROR(this->get_logger(), "Failed to load translator plugin '%s': %s", translator_plugin_name.c_str(), ex.what());
     }
 
     subscription_ = this->create_subscription<nexus_communication_protocol::msg::GoToWaypoint>(
