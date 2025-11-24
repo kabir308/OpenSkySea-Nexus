@@ -1,0 +1,36 @@
+# Dockerfile Léger - OpenSkySea-Nexus
+# Pour machines avec ressources limitées (8 GB RAM, pas de GPU)
+
+FROM ros:humble-ros-base
+
+SHELL ["/bin/bash", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Installer uniquement les dépendances essentielles
+RUN apt-get update && apt-get install -y \
+    git \
+    python3-pip \
+    python3-rosdep \
+    python3-colcon-common-extensions \
+    # Nettoyer cache pour réduire taille image
+    && rm -rf /var/lib/apt/lists/*
+
+# Initialiser rosdep
+RUN rosdep init && rosdep update
+
+# Créer workspace
+WORKDIR /ros2_ws
+
+# Copier le code source
+COPY . ./src
+
+# Installer dépendances ROS (sans GUI/Gazebo lourd)
+RUN . /opt/ros/humble/setup.bash && \
+    rosdep install --from-paths src --ignore-src -r -y || true
+
+# Point d'entrée
+COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["bash"]
