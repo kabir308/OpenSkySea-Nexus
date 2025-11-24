@@ -1,0 +1,101 @@
+# ROS 2 / colcon build artifacts
+build/
+install/
+log/
+*.egg-info/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# C++
+*.o
+*.a
+*.so
+*.dylib
+*.out
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.code-workspace
+
+# Gazebo
+.gazebo/
+*.log
+
+# Docker
+.dockerignore
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+/tmp/
+/temp/
+
+# Documentation build
+docs/_build/
+docs/.doctrees/
+html/
+latex/
+*.pdf
+
+# Bags (ROS data recordings)
+*.bag
+*.db3
+*.db3-*
+
+# Simulation outputs
+*.avi
+*.mp4
+screenshots/
+recordings/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Distribution
+dist/
+*.tar.gz
+*.zip
+
+# ArduPilot SITL
+ardupilot/
+*.bin
+*.elf
+*.parm
+
+# Testing
+.tox/
+.nox/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Misc
+*.lock
+node_modules/
