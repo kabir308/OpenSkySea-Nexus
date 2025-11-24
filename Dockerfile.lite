@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-rosdep \
     python3-colcon-common-extensions \
-    # Nettoyer cache pour réduire taille image
     && rm -rf /var/lib/apt/lists/*
 
 # Initialiser rosdep
